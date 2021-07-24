@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "796209752862",
+    "project_id": "ulboard-mobile",
+    "storage_bucket": "ulboard-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796209752862:android:c93e9f18b5e02c6321f70f",
+        "android_client_info": {
+          "package_name": "com.ulboard_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "796209752862-39bc930uva3bmvc4578mjm9g7q5jjer9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx7bvv-rEFqQoTXfE25_UkERfjJ-dqSrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "796209752862-39bc930uva3bmvc4578mjm9g7q5jjer9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
