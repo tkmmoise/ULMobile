@@ -11,26 +11,23 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useQuery} from '@apollo/client';
 
-//Redux
-import {useDispatch, useSelector} from 'react-redux';
-import {fetchMessage, messageSelector} from '../redux/slices/singleMessage';
+// Graphql apolo client import
+import {GET_MESSAGE} from '../graphql/queries';
 
 //My imports
 import colors from '../../assets/colors/colors';
 
 const Detail = ({route, navigation}) => {
-  const dispatch = useDispatch();
+  const {id} = route.params;
 
-  const {message, isLoading, HasErrors} = useSelector(messageSelector);
+  function Message(_id) {
+    const {loading, error, data} = useQuery(GET_MESSAGE, {
+      variables: {_id},
+    });
 
-  useEffect(() => {
-    const {id} = route.params;
-    dispatch(fetchMessage(id));
-  }, [dispatch, route]);
-
-  const renderMessage = () => {
-    if (isLoading)
+    if (loading) {
       return (
         <ActivityIndicator
           color={colors.primary}
@@ -38,18 +35,22 @@ const Detail = ({route, navigation}) => {
           style={styles.activityIndicator}
         />
       );
-    if (HasErrors)
+    }
+    if (error) {
       return (
         <View>
-          <Text>Unable to loading noeuds</Text>
+          <Text>{`Error! ${error.message}`}</Text>
         </View>
       );
+    }
     return (
       <>
         {/* Header */}
         <View style={styles.headerWrapper}>
           <View style={styles.headerWrapperTop}>
-            <Text style={styles.messageTitle}>{message.messageObject}</Text>
+            <Text style={styles.messageTitle}>
+              {data.messageById.messageObject}
+            </Text>
             <View style={styles.logoWrapper}>
               <Image
                 style={styles.logo}
@@ -59,20 +60,25 @@ const Detail = ({route, navigation}) => {
           </View>
           <View style={styles.headerWrapperBottom}>
             <Text>
-              Par <Text style={styles.messageAuthor}>{message.senderId}</Text>
+              Par{' '}
+              <Text style={styles.messageAuthor}>
+                {data.messageById.sender.name}
+              </Text>
             </Text>
-            <Text style={styles.messageTextDate}>Publié {message.date}</Text>
+            <Text style={styles.messageTextDate}>
+              Publié {data.messageById.date}
+            </Text>
           </View>
         </View>
 
         {/* Contenu */}
         <View style={styles.container2}>
           <Text style={styles.title}>Contenu</Text>
-          <Text style={styles.text}>{message.messageContent}</Text>
+          <Text style={styles.text}>{data.messageById.messageContent}</Text>
         </View>
       </>
     );
-  };
+  }
 
   return (
     <View style={styles.detailBackground}>
@@ -88,7 +94,7 @@ const Detail = ({route, navigation}) => {
         </View>
       </SafeAreaView>
       <ScrollView>
-        {renderMessage()}
+        {Message(id)}
         {/* Pieces Jointes */}
         <View style={{...styles.container2, marginBottom: 30}}>
           <Text style={styles.title}>Pièces jointes</Text>

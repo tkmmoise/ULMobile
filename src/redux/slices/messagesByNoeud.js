@@ -51,7 +51,7 @@ export function fetchMessages(id) {
 
     try {
       const client = new ApolloClient({
-        uri: 'http://192.168.1.123:3000/graphql',
+        uri: 'http://192.168.43.36:4000/graphql',
         cache: new InMemoryCache(),
       });
 
@@ -59,26 +59,25 @@ export function fetchMessages(id) {
         query: gql`
           query GetMessagesByNoeudId {
             noeudById(_id: "${id}") {
+              _id
               name
               acronym
-              senders {
-                messages {
-                  _id
-                  messageId
-                  messageObject
-                  messageContent
-                  date
-                  files {
-                    mimeType
-                    fileId
-                    fileName
-                    size
-                  }
-                  sender {
-                    name
-                    jobTitle
-                    email
-                  }
+              messages{
+                messageId
+                messageObject
+                messageContent
+                date
+                files{
+                  mimeType
+                  fileId
+                  fileName
+                  size
+                }
+                sender{
+                  name
+                  jobTitle
+                  email
+                  
                 }
               }
             }
@@ -94,7 +93,7 @@ export function fetchMessages(id) {
       // );
       // const da = id === "60dd18ee67831b4344d4b0eb" ? res2 : response;
       // const data = await da.json();
-      dispatch(getMessagesSucess(response.data.noeudById.senders[0].messages));
+      dispatch(getMessagesSucess(response.data.noeudById.messages));
     } catch (error) {
       dispatch(getMessagesFailure());
     }

@@ -10,40 +10,50 @@ import {
   FlatList,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import {useQuery} from '@apollo/client';
 // colors import
 import colors from '../../assets/colors/colors';
 
 //components import
 import Message from '../components/Message';
 
-//redux impor
-import {useDispatch, useSelector} from 'react-redux';
-import {
-  getSearchingMessages,
-  messagesSelector,
-  fetchMessages,
-} from '../redux/slices/allMessages';
+//graphql import
+import {GET_ALL_MESSAGES} from '../graphql/queries';
 
 const SearchPage = props => {
   //States
   const [searchText, setSearchText] = useState('');
-  //const [messagesLength,setMessagesLength] = useState();
 
-  // For redux
-  const dispatch = useDispatch();
-  const {
-    messages,
-    isLoading: messagesIsLoading,
-    hasErrors: messagesHasErrors,
-  } = useSelector(messagesSelector);
+  //
+  const {loading, error, data} = useQuery(GET_ALL_MESSAGES);
+  function AllMessages() {
+    if (loading) {
+      return (
+        <ActivityIndicator
+          color={colors.primary}
+          size={'large'}
+          style={styles.activityIndicator}
+        />
+      );
+    }
+    if (error) {
+      return (
+        <View>
+          <Text>{`Error! ${error.message}`}</Text>
+        </View>
+      );
+    }
+    return (
+      <FlatList
+        data={searchedMessages}
+        renderItem={renderMessageItem}
+        keyExtractor={item => item._id}
+        showsVerticalScrollIndicator={false}
+      />
+    );
+  }
+  //
 
-  // Fetch all messages after mounting conponent
-  useEffect(() => {
-    dispatch(fetchMessages());
-  }, [dispatch]);
-
-  // ----------For messages per noeud list render---------
   const renderMessageItem = ({item}) => {
     return (
       <Message
@@ -54,32 +64,6 @@ const SearchPage = props => {
       />
     );
   };
-
-  const rendersMessages = () => {
-    if (messagesIsLoading)
-      return (
-        <ActivityIndicator
-          color={colors.primary}
-          size={'large'}
-          style={styles.activityIndicator}
-        />
-      );
-    if (messagesHasErrors)
-      return (
-        <View>
-          <Text>Unable to loading noeuds</Text>
-        </View>
-      );
-    return (
-      <FlatList
-        data={searchedMessages}
-        renderItem={renderMessageItem}
-        keyExtractor={item => item._id}
-        showsVerticalScrollIndicator={false}
-      />
-    );
-  };
-  // ----------For messages per noeuds list render End---------
 
   // Handle serache input
   const handleSearchInput = text => {
@@ -95,7 +79,7 @@ const SearchPage = props => {
   const searchedMessages =
     searchText === ''
       ? []
-      : messages.slice().filter(message => {
+      : data.messageMany.slice().filter(message => {
           const newText = searchText.toLowerCase();
           return `${message.messageObject}`.toLowerCase().includes(newText);
         });
@@ -148,7 +132,7 @@ const SearchPage = props => {
         </View>
       </SafeAreaView>
       {/* Messages */}
-      <View style={styles.messageWrapper}>{rendersMessages()}</View>
+      <View style={styles.messageWrapper}>{AllMessages()}</View>
     </View>
   );
 };

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {DrawerActions} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useQuery} from '@apollo/client';
 
 //My imports
 import colors from '../../assets/colors/colors';
@@ -32,6 +33,9 @@ import {
   messagesSelector,
   getSortedMessages,
 } from '../redux/slices/messagesByNoeud';
+
+// Graphql apolo client import
+import {GET_NODES, GET_MESSAGES_BY_NODE} from '../graphql/queries';
 
 export const Home = props => {
   // State For active noeud
@@ -73,7 +77,32 @@ export const Home = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noeuds]);
 
-  // ----------For noeuds list render---------
+  //-------- fetch all nodes in graphqg database---------
+  function Noeuds() {
+    const {loading, error, data} = useQuery(GET_NODES);
+
+    if (loading) {
+      return <ActivityIndicator color={colors.primary} size={'small'} />;
+    }
+    if (error) {
+      return (
+        <View>
+          <Text>{`Error! ${error.message}`}</Text>
+        </View>
+      );
+    }
+    return (
+      <FlatList
+        data={data.noeudMany}
+        renderItem={renderNoeudItem}
+        keyExtractor={item => item._id}
+        extraData={selectedNoeud}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+      />
+    );
+  }
+
   const renderNoeudItem = ({item}) => {
     const color =
       item._id === selectedNoeud ? colors.primary : colors.secondary;
@@ -89,30 +118,39 @@ export const Home = props => {
     );
   };
 
-  const rendersNoeuds = () => {
-    if (noeudsIsLoading)
-      return <ActivityIndicator color={colors.primary} size={'small'} />;
-    if (noeudsHasErrors)
+  //------- fetch all message by node in graphql database ------
+
+  function Messages(_id) {
+    const {loading, error, data} = useQuery(GET_MESSAGES_BY_NODE, {
+      variables: {_id},
+    });
+
+    if (loading) {
+      return (
+        <ActivityIndicator
+          color={colors.primary}
+          size={'large'}
+          style={styles.activityIndicator}
+        />
+      );
+    }
+    if (error) {
       return (
         <View>
-          <Text>Unable to loading noeuds</Text>
+          <Text>{`Error! ${error.message}`}</Text>
         </View>
       );
+    }
     return (
       <FlatList
-        data={noeuds}
-        renderItem={renderNoeudItem}
+        data={data.noeudById.messages}
+        renderItem={renderMessageItem}
         keyExtractor={item => item._id}
-        extraData={selectedNoeud}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       />
     );
-  };
+  }
 
-  // ----------For noeuds list render End---------
-
-  // ----------For messages per noeud list render---------
   const renderMessageItem = ({item}) => {
     return (
       <Message
@@ -123,32 +161,7 @@ export const Home = props => {
       />
     );
   };
-
-  const rendersMessages = () => {
-    if (messagesIsLoading)
-      return (
-        <ActivityIndicator
-          color={colors.primary}
-          size={'large'}
-          style={styles.activityIndicator}
-        />
-      );
-    if (messagesHasErrors)
-      return (
-        <View>
-          <Text>Unable to loading noeuds</Text>
-        </View>
-      );
-    return (
-      <FlatList
-        data={messages}
-        renderItem={renderMessageItem}
-        keyExtractor={item => item._id}
-        showsVerticalScrollIndicator={false}
-      />
-    );
-  };
-  // ----------For messages per noeuds list render End---------
+  //------- fetch all message by node in graphql database end ------
 
   // Toggle Drawer function
   // ****click the menu to open the drawer***
@@ -202,7 +215,7 @@ export const Home = props => {
       </SafeAreaView>
 
       {/* Types of nodes */}
-      <View style={styles.noeudWrapper}>{rendersNoeuds()}</View>
+      <View style={styles.noeudWrapper}>{Noeuds()}</View>
 
       {/* Filters */}
 
@@ -236,7 +249,9 @@ export const Home = props => {
       </View>
 
       {/* Messages */}
-      <View style={styles.messageWrapper}>{rendersMessages()}</View>
+      <View style={styles.messageWrapper}>
+        {Messages('60dd18a767831b4344d4b0e2')}
+      </View>
     </View>
   );
 };

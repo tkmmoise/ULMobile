@@ -45,7 +45,7 @@ export function fetchNoeuds() {
 
     try {
       const client = new ApolloClient({
-        uri: 'http://192.168.1.123:3000/graphql',
+        uri: 'http://192.168.43.36:4000/graphql',
         cache: new InMemoryCache(),
       });
 
