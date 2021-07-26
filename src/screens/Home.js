@@ -39,7 +39,9 @@ import {GET_NODES, GET_MESSAGES_BY_NODE} from '../graphql/queries';
 
 export const Home = props => {
   // State For active noeud
-  const [selectedNoeud, setSelectedNoeud] = useState('');
+  const [selectedNoeud, setSelectedNoeud] = useState(
+    '60dd18a767831b4344d4b0e2',
+  );
   // State For sort messages
   const [visible, setVisible] = useState(false);
   const [sortText, setSortText] = useState({});
@@ -59,23 +61,6 @@ export const Home = props => {
     isLoading: messagesIsLoading,
     hasErrors: messagesHasErrors,
   } = useSelector(messagesSelector);
-
-  //Fetch all noeuds
-  useEffect(() => {
-    dispatch(fetchNoeuds());
-  }, [dispatch]);
-
-  //Select first noeud, put on active and fetch its messages
-  useEffect(() => {
-    if (noeuds.length !== 0) {
-      setSelectedNoeud(noeuds[0]._id);
-      dispatch(fetchMessages(noeuds[0]._id));
-    }
-    return () => {
-      messages;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [noeuds]);
 
   //-------- fetch all nodes in graphqg database---------
   function Noeuds() {
@@ -111,7 +96,6 @@ export const Home = props => {
         item={item}
         onPress={() => {
           setSelectedNoeud(item._id);
-          dispatch(fetchMessages(item._id));
         }}
         textColor={color}
       />
@@ -141,7 +125,13 @@ export const Home = props => {
         </View>
       );
     }
-    return (
+    return data.noeudById.messages.length === 0 ? (
+      <View style={styles.messageContainer}>
+        <Text style={styles.messageText}>
+          Aucun message publié sur ce noeud
+        </Text>
+      </View>
+    ) : (
       <FlatList
         data={data.noeudById.messages}
         renderItem={renderMessageItem}
@@ -249,9 +239,7 @@ export const Home = props => {
       </View>
 
       {/* Messages */}
-      <View style={styles.messageWrapper}>
-        {Messages('60dd18a767831b4344d4b0e2')}
-      </View>
+      <View style={styles.messageWrapper}>{Messages(selectedNoeud)}</View>
     </View>
   );
 };
@@ -317,6 +305,14 @@ const styles = StyleSheet.create({
     margin: 30,
     backgroundColor: 'white',
     borderRadius: 4,
+  },
+  messageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  messageText: {
+    textAlign: 'center',
   },
 });
 export default Home;

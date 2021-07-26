@@ -52,6 +52,7 @@ exports.GET_MESSAGE = gql`
         fileName
         size
       }
+      senderId
       sender {
         name
         jobTitle
@@ -69,11 +70,13 @@ exports.GET_ALL_MESSAGES = gql`
       messageContent
       date
       files {
+        _id
         mimeType
         fileId
         fileName
         size
       }
+      senderId
       sender {
         name
         jobTitle

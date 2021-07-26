@@ -12,9 +12,13 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useQuery} from '@apollo/client';
+import moment from 'moment';
 
 // Graphql apolo client import
 import {GET_MESSAGE} from '../graphql/queries';
+
+//Attachements import
+import {getURL} from '../services/attachements';
 
 //My imports
 import colors from '../../assets/colors/colors';
@@ -66,7 +70,7 @@ const Detail = ({route, navigation}) => {
               </Text>
             </Text>
             <Text style={styles.messageTextDate}>
-              Publié {data.messageById.date}
+              Publié le {moment(data.messageById.date).format('DD/MM/YY hh:mm')}
             </Text>
           </View>
         </View>
@@ -75,6 +79,17 @@ const Detail = ({route, navigation}) => {
         <View style={styles.container2}>
           <Text style={styles.title}>Contenu</Text>
           <Text style={styles.text}>{data.messageById.messageContent}</Text>
+        </View>
+        {/* Pieces Jointes */}
+        <View style={{...styles.container2, marginBottom: 30}}>
+          <Text style={styles.title}>Pièces jointes</Text>
+          {data.messageById.files.map(file => {
+            return (
+              <TouchableOpacity style={styles.button} key={file._id}>
+                <Text style={styles.button_text}>{file.fileName}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </>
     );
@@ -93,16 +108,7 @@ const Detail = ({route, navigation}) => {
           <Ionicons name="ellipsis-vertical" size={37} color="#000" />
         </View>
       </SafeAreaView>
-      <ScrollView>
-        {Message(id)}
-        {/* Pieces Jointes */}
-        <View style={{...styles.container2, marginBottom: 30}}>
-          <Text style={styles.title}>Pièces jointes</Text>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.button_text}>Commencer</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      <ScrollView>{Message(id)}</ScrollView>
     </View>
   );
 };
@@ -148,6 +154,7 @@ const styles = StyleSheet.create({
   headerWrapperBottom: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginVertical: 10,
   },
   messageAuthor: {

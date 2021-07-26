@@ -13,8 +13,11 @@ import {configureStore} from '@reduxjs/toolkit';
 //graphql
 import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
 
+//server uri
+import {uri} from './src/config/apollo.config';
+
 const client = new ApolloClient({
-  uri: 'http://192.168.43.36:4000/graphql',
+  uri: uri + 'graphql',
   cache: new InMemoryCache(),
 });
 
@@ -27,7 +30,7 @@ const App = () => {
       await messaging().registerDeviceForRemoteMessages();
       const token = await messaging().getToken();
 
-      await axios.post('http://192.168.43.36:4000/api/fcmToken/create', {
+      await axios.post(uri + 'api/fcmToken/create', {
         token,
       });
     } catch (err) {

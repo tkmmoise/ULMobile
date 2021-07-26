@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import moment from 'moment';
 
 //colors
 import colors from '../../assets/colors/colors';
@@ -20,13 +21,15 @@ const Message = ({item, onPress}) => {
             </Text>
             <Text>
               Par{' '}
-              <Text style={styles.messageCardRightAuthor}>{item.senderId}</Text>
+              <Text style={styles.messageCardRightAuthor}>
+                {item.sender?.name}
+              </Text>
             </Text>
           </View>
         </View>
         <View style={styles.messageCardBottom}>
           <Text style={styles.messageCardBottomText}>
-            Publie le {item.date}
+            Publie le {moment(item.date).format('DD/MM/YY hh:mm')}
           </Text>
         </View>
       </View>
