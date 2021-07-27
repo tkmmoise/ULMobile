@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "796209752862",
-    "project_id": "ulboard-mobile",
-    "storage_bucket": "ulboard-mobile.appspot.com"
+    "project_number": "258665436478",
+    "project_id": "ulboard-309fd",
+    "storage_bucket": "ulboard-309fd.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:796209752862:android:c93e9f18b5e02c6321f70f",
+        "mobilesdk_app_id": "1:258665436478:android:f8077ca6e856a4d3e2c86f",
         "android_client_info": {
           "package_name": "com.ulboard_mobile"
         }
       },
       "oauth_client": [
         {
-          "client_id": "796209752862-39bc930uva3bmvc4578mjm9g7q5jjer9.apps.googleusercontent.com",
+          "client_id": "258665436478-vcocn1n48840cabkvc35of30k5dbn8a1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBx7bvv-rEFqQoTXfE25_UkERfjJ-dqSrI"
+          "current_key": "AIzaSyDH8n1tTASfSW_5_ZA33MXumdtBIpkg5Zs"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "796209752862-39bc930uva3bmvc4578mjm9g7q5jjer9.apps.googleusercontent.com",
+              "client_id": "258665436478-vcocn1n48840cabkvc35of30k5dbn8a1.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

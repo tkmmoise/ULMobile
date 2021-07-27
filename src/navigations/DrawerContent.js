@@ -87,19 +87,18 @@ export function DrawerContent(props) {
             </TouchableRipple>
           </Drawer.Section>
         </View>
+        <Drawer.Section style={styles.bottomDrawerSection} {...props}>
+          <Drawer.Item
+            icon="home"
+            label="Home"
+            onPress={() => {
+              props.navigation.navigate('Home');
+            }}
+          />
+          <Drawer.Item icon="cog-outline" label="Paramètres" />
+          <Drawer.Item icon="exit-to-app" label="Quitter" />
+        </Drawer.Section>
       </DrawerContentScrollView>
-
-      <Drawer.Section style={styles.bottomDrawerSection} {...props}>
-        <Drawer.Item
-          icon="home"
-          label="Home"
-          onPress={() => {
-            props.navigation.navigate('Home');
-          }}
-        />
-        <Drawer.Item icon="cog-outline" label="Paramètres" />
-        <Drawer.Item icon="exit-to-app" label="Quitter" />
-      </Drawer.Section>
     </View>
   );
 }
