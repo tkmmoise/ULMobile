@@ -1,11 +1,33 @@
-import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
+import {DrawerContentScrollView} from '@react-navigation/drawer';
 import {Drawer, TouchableRipple, Switch} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import colors from '../../assets/colors/colors';
 
+//graphql
+import {GET_NODES} from '../graphql/queries';
+import {useQuery} from '@apollo/client';
+import {currentSelectedNoeudsIds} from '../config/cache';
+
 export function DrawerContent(props) {
+  //fetch all nodes
+  const {data} = useQuery(GET_NODES);
+  const noeuds = data?.noeudMany;
+  const currentSelectedNoeuds = currentSelectedNoeudsIds();
+  console.log('noueuds select', currentSelectedNoeuds);
+
+  const toggleNoeudSelected = noeudId => {
+    const allSelectedNoeuds = currentSelectedNoeudsIds();
+    const found = !!allSelectedNoeuds.find(t => t === noeudId);
+
+    if (found) {
+      currentSelectedNoeudsIds(allSelectedNoeuds.filter(t => t !== noeudId));
+    } else {
+      currentSelectedNoeudsIds(allSelectedNoeuds.concat(noeudId));
+    }
+  };
+
   return (
     <View style={{flex: 1}}>
       <DrawerContentScrollView {...props}>
@@ -18,92 +40,49 @@ export function DrawerContent(props) {
 
           <View style={styles.noeudTitle}>
             <Ionicons name="school" size={28} style={{marginRight: 15}} />
-            <Text style={styles.title}>ECOLES</Text>
+            <Text style={styles.title}>ECOLES / FACULTES</Text>
           </View>
           {/* Ecoles */}
           <Drawer.Section>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>CIC</Text>
-                <View pointerEvents="none">
-                  <Switch value={false} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>ENSI</Text>
-                <View pointerEvents="none">
-                  <Switch value={true} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>IUT-GESTION</Text>
-                <View pointerEvents="none">
-                  <Switch value={true} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>ISIA</Text>
-                <View pointerEvents="none">
-                  <Switch value={true} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
-          </Drawer.Section>
-          {/* Facultes */}
-          <View style={styles.noeudTitle}>
-            <Ionicons name="school" size={28} style={{marginRight: 15}} />
-            <Text style={styles.title}>FACULTES</Text>
-          </View>
-          <Drawer.Section>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>FASEG</Text>
-                <View pointerEvents="none">
-                  <Switch value={true} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>FDD</Text>
-                <View pointerEvents="none">
-                  <Switch value={true} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
-            <TouchableRipple>
-              <View style={styles.preference}>
-                <Text>FSS</Text>
-                <View pointerEvents="none">
-                  <Switch value={true} color={colors.primary} />
-                </View>
-              </View>
-            </TouchableRipple>
+            {noeuds?.map(noeud => {
+              return (
+                <TouchableRipple key={noeud._id}>
+                  <View style={styles.preference}>
+                    <Text>{noeud.acronym}</Text>
+                    <View>
+                      <Switch
+                        value={noeud.isSelected}
+                        color={colors.primary}
+                        onValueChange={() => toggleNoeudSelected(noeud._id)}
+                      />
+                    </View>
+                  </View>
+                </TouchableRipple>
+              );
+            })}
           </Drawer.Section>
         </View>
-        <Drawer.Section style={styles.bottomDrawerSection} {...props}>
-          <Drawer.Item
-            icon="home"
-            label="Home"
-            onPress={() => {
-              props.navigation.navigate('Home');
-            }}
-          />
-          <Drawer.Item icon="cog-outline" label="Paramètres" />
-          <Drawer.Item icon="exit-to-app" label="Quitter" />
-        </Drawer.Section>
       </DrawerContentScrollView>
+      <Drawer.Section style={styles.bottomDrawerSection} {...props}>
+        <Drawer.Item
+          icon="home"
+          label="Home"
+          onPress={() => {
+            props.navigation.navigate('Home');
+          }}
+          style={styles.drawerItem}
+        />
+        <Drawer.Item icon="cog-outline" label="Paramètres" />
+        <Drawer.Item icon="exit-to-app" label="Quitter" />
+      </Drawer.Section>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  drawerContentscrollView: {
+    justifyContent: 'space-between',
+  },
   drawerContent: {
     flex: 1,
   },
@@ -146,7 +125,12 @@ const styles = StyleSheet.create({
   drawerSection: {
     marginTop: 15,
   },
-  bottomDrawerSection: {},
+  bottomDrawerSection: {
+    backgroundColor: colors.textDark,
+  },
+  drawerItem: {
+    color: colors.textDark,
+  },
   preference: {
     flexDirection: 'row',
     justifyContent: 'space-between',

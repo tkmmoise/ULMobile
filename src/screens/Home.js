@@ -25,23 +25,27 @@ import SortComponent from '../components/SortComponent';
 // sortList data for sorting messages
 import sortlist from '../../assets/data/sortList';
 
-// redux modules import
-import {useDispatch, useSelector} from 'react-redux';
-import {fetchNoeuds, noeudsSelector} from '../redux/slices/noeuds';
-import {
-  fetchMessages,
-  messagesSelector,
-  getSortedMessages,
-} from '../redux/slices/messagesByNoeud';
-
 // Graphql apolo client import
 import {GET_NODES, GET_MESSAGES_BY_NODE} from '../graphql/queries';
+import {currentSelectedNoeudsIds} from '../config/cache';
 
 export const Home = props => {
   // State For active noeud
   const [selectedNoeud, setSelectedNoeud] = useState(
     '60dd18a767831b4344d4b0e2',
   );
+  // Fetch all noeuds in graphql server
+  const {loading, error, data} = useQuery(GET_NODES);
+  // const allnoeudsIds = data?.noeudMany.map(noeud => {
+  //   return noeud._id;
+  // });
+  // allnoeudsIds && currentSelectedNoeudsIds([...allnoeudsIds] || []);
+  // console.log('allnoeudsIds', allnoeudsIds);
+
+  // useEffect(() => {
+  //   allnoeudsIds && currentSelectedNoeudsIds([...allnoeudsIds] || []);
+  // }, []);
+
   // State For sort messages
   const [visible, setVisible] = useState(false);
   const [sortText, setSortText] = useState({});
@@ -49,23 +53,9 @@ export const Home = props => {
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  // Redux
-  const dispatch = useDispatch();
-  const {
-    noeuds,
-    isLoading: noeudsIsLoading,
-    hasErrors: noeudsHasErrors,
-  } = useSelector(noeudsSelector);
-  const {
-    messages,
-    isLoading: messagesIsLoading,
-    hasErrors: messagesHasErrors,
-  } = useSelector(messagesSelector);
 
   //-------- fetch all nodes in graphqg database---------
   function Noeuds() {
-    const {loading, error, data} = useQuery(GET_NODES);
-
     if (loading) {
       return <ActivityIndicator color={colors.primary} size={'small'} />;
     }
@@ -176,7 +166,6 @@ export const Home = props => {
     });
     setSortBy(newSortOrder);
     setSortText(data);
-    dispatch(getSortedMessages({type: data.desc}));
     hideModal();
   };
 

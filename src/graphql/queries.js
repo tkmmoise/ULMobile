@@ -6,6 +6,7 @@ exports.GET_NODES = gql`
       name
       acronym
       _id
+      isSelected @client
     }
   }
 `;
