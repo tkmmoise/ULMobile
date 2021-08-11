@@ -74,12 +74,12 @@ const Detail = ({route, navigation}) => {
   };
 
   // For download File
-  const checkPermission = async uri => {
+  const checkPermission = async (uri, fileName) => {
     // Function to check the platform
     // If Platform is Android then check for permissions.
 
     if (Platform.OS === 'ios') {
-      downloadFile(uri);
+      downloadFile(uri, fileName);
     } else {
       try {
         const granted = await PermissionsAndroid.request(
@@ -92,7 +92,7 @@ const Detail = ({route, navigation}) => {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           // Start downloading
-          downloadFile(uri);
+          downloadFile(uri, fileName);
           console.log('Storage Permission Granted.');
         } else {
           // If permission denied then show alert
@@ -105,7 +105,7 @@ const Detail = ({route, navigation}) => {
     }
   };
 
-  const downloadFile = uri => {
+  const downloadFile = (uri, fileName) => {
     // Get today's date to add the time suffix in filename
     let date = new Date();
     // File URL which we want to download
@@ -122,11 +122,12 @@ const Detail = ({route, navigation}) => {
     let options = {
       fileCache: true,
       addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
+         path:
+           RootDir +
+           '/file_' +
+           Math.floor(date.getTime() + date.getSeconds() / 2) +
+           file_ext,
+        //path: `${RootDir}/${fileName}`,
         description: 'downloading file...',
         notification: true,
         // useDownloadManager works with Android only
@@ -241,6 +242,7 @@ const Detail = ({route, navigation}) => {
                             file.mimeType,
                             file.fileName,
                           ),
+                          file.fileName
                         );
                       }}
                     />
@@ -293,6 +295,7 @@ const Detail = ({route, navigation}) => {
                               file.mimeType,
                               file.fileName,
                             ),
+                            file.fileName
                           );
                         }}
                       />

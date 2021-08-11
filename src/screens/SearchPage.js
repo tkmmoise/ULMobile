@@ -150,12 +150,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 20,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    //justifyContent: 'space-between',
   },
   appBar_text: {
     fontWeight: 'bold',
     fontSize: 20,
     marginRight: 20,
+    marginLeft: 80
   },
   searchInputContainer: {
     marginTop: 20,
@@ -176,13 +177,13 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 44,
     //backgroundColor: "red",
-    marginLeft: 4,
+    marginLeft: 20,
     color: '#000',
   },
   searchIcon: {
     alignSelf: 'center',
     //backgroundColor: "blue",
-    marginRight: 2,
+    marginRight: 20,
   },
   numberResultsContainer: {
     marginVertical: 10,

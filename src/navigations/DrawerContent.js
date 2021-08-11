@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+    marginTop: -10
   },
   appTitle: {
     color: colors.white,
@@ -126,7 +127,9 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   bottomDrawerSection: {
-    backgroundColor: colors.textDark,
+    //backgroundColor: colors.textDark,
+    borderTopWidth: 1,
+    borderColor: "black"
   },
   drawerItem: {
     color: colors.textDark,
