@@ -7,6 +7,10 @@ import Detail from '../screens/Detail';
 import SearchPage from '../screens/SearchPage';
 import DrawerNavigator from './DrawerNavigator';
 
+//graphql import
+import {GET_NODES} from '../graphql/queries';
+import {useQuery} from '@apollo/client';
+
 const Stack = createStackNavigator();
 
 const screenOptionStyle = {
@@ -14,15 +18,29 @@ const screenOptionStyle = {
 };
 
 const AppStackNavigator = () => {
+  const {data} = useQuery(GET_NODES);
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
   let routeName;
 
+  // set all noeuds IDs in async storage
+  const setNoeudsIdsInStorage = () => {
+    const allnoeudsIds = data?.noeudMany.map(noeud => {
+      return noeud._id;
+    });
+    allnoeudsIds && AsyncStorage.setItem('noeudsIds', allnoeudsIds);
+    console.log('allnoeudsIds', allnoeudsIds);
+  };
+
   const checkIsFirstLaunch = async () => {
     const value = await AsyncStorage.getItem('alreadyLaunched');
+    const noeudsIds = await AsyncStorage.getItem('noeudsIds');
     console.log('value', value);
+    console.log(data);
+    console.log('noeudsIds', noeudsIds);
     if (value == null) {
       AsyncStorage.setItem('alreadyLaunched', 'true');
       setIsFirstLaunch(true);
+      setNoeudsIdsInStorage();
     } else {
       setIsFirstLaunch(false);
     }
@@ -34,7 +52,7 @@ const AppStackNavigator = () => {
 
   if (isFirstLaunch === null) {
     return null;
-  } else if (isFirstLaunch == true) {
+  } else if (isFirstLaunch === true) {
     routeName = 'Started';
   } else {
     routeName = 'Home';

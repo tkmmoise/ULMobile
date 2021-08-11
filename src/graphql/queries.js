@@ -48,6 +48,7 @@ exports.GET_MESSAGE = gql`
       messageContent
       date
       files {
+        _id
         mimeType
         fileId
         fileName

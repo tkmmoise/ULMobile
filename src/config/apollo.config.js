@@ -1,1 +1,1 @@
-exports.uri = 'http://192.168.43.166:4000/';
+exports.uri = 'https://ulboard-back.herokuapp.com/';

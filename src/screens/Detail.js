@@ -9,10 +9,22 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
+  Dimensions,
+  PermissionsAndroid,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useQuery} from '@apollo/client';
 import moment from 'moment';
+import FileViewer from 'react-native-file-viewer';
+import Pdf from 'react-native-pdf';
+import {Card, Button, Icon} from 'react-native-elements';
+
+//For file upload
+var RNFS = require('react-native-fs');
+import RNFetchBlob from 'rn-fetch-blob';
 
 // Graphql apolo client import
 import {GET_MESSAGE} from '../graphql/queries';
@@ -22,9 +34,118 @@ import {getURL} from '../services/attachements';
 
 //My imports
 import colors from '../../assets/colors/colors';
+import {uri} from '../config/apollo.config';
 
 const Detail = ({route, navigation}) => {
   const {id} = route.params;
+
+  const source = 'http://samples.leanpub.com/thereactnativebook-sample.pdf';
+
+  const onFileView = async (file, messageId) => {
+    // Put your url here -----
+
+    const url = getURL(messageId, file.fileId, file.mimeType, file.fileName);
+    // -----
+    console.log(url);
+    // this will split the whole url.
+    const f2 = url.split('/');
+
+    // then get the file name with extention.
+    const fileName = f2[f2.length - 1];
+    // const fileExtention = url.split(".")[3];
+    // create a local file path from url
+    const localFile = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+    const options = {
+      fromUrl: url,
+      toFile: localFile,
+    };
+
+    // last step it will download open it with .
+    RNFS.downloadFile(options)
+      .promise.then(() => FileViewer.open(localFile))
+      .then(() => {
+        // success
+        // Here you can perform any of your completion tasks
+      })
+      .catch(error => {
+        console.log(error);
+        // error
+      });
+  };
+
+  // For download File
+  const checkPermission = async uri => {
+    // Function to check the platform
+    // If Platform is Android then check for permissions.
+
+    if (Platform.OS === 'ios') {
+      downloadFile(uri);
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission Required',
+            message:
+              'Application needs access to your storage to download File',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // Start downloading
+          downloadFile(uri);
+          console.log('Storage Permission Granted.');
+        } else {
+          // If permission denied then show alert
+          Alert.alert('Error', 'Storage Permission Not Granted');
+        }
+      } catch (err) {
+        // To handle permission related exception
+        console.log('++++' + err);
+      }
+    }
+  };
+
+  const downloadFile = uri => {
+    // Get today's date to add the time suffix in filename
+    let date = new Date();
+    // File URL which we want to download
+    let FILE_URL = uri;
+    // Function to get extention of the file url
+    let file_ext = getFileExtention(FILE_URL);
+
+    file_ext = '.' + file_ext[0];
+
+    // config: To get response by passing the downloading related options
+    // fs: Root directory path to download
+    const {config, fs} = RNFetchBlob;
+    let RootDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        path:
+          RootDir +
+          '/file_' +
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          file_ext,
+        description: 'downloading file...',
+        notification: true,
+        // useDownloadManager works with Android only
+        useDownloadManager: true,
+      },
+    };
+    config(options)
+      .fetch('GET', FILE_URL)
+      .then(res => {
+        // Alert after successful downloading
+        console.log('res -> ', JSON.stringify(res));
+        alert('File Downloaded Successfully.');
+      });
+  };
+
+  const getFileExtention = fileUrl => {
+    // To get the file extension
+    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+  };
 
   function Message(_id) {
     const {loading, error, data} = useQuery(GET_MESSAGE, {
@@ -82,12 +203,101 @@ const Detail = ({route, navigation}) => {
         </View>
         {/* Pieces Jointes */}
         <View style={{...styles.container2, marginBottom: 30}}>
-          <Text style={styles.title}>Pièces jointes</Text>
+          <Text style={[styles.title, {marginBottom: 10}]}>Pièces jointes</Text>
           {data.messageById.files.map(file => {
             return (
-              <TouchableOpacity style={styles.button} key={file._id}>
-                <Text style={styles.button_text}>{file.fileName}</Text>
-              </TouchableOpacity>
+              <View key={file._id}>
+                {file.mimeType.includes('image') && (
+                  <Card style={styles.card}>
+                    <Card.Image
+                      source={{
+                        uri: `${getURL(
+                          data.messageById.messageId,
+                          file.fileId,
+                          file.mimeType,
+                          file.fileName,
+                        )}`,
+                      }}
+                      PlaceholderContent={<ActivityIndicator />}
+                      style={styles.imageAttachement}
+                    />
+                    <Button
+                      icon={
+                        <Icon
+                          name="image"
+                          size={20}
+                          color="#fff"
+                          type="font-awesome-5"
+                          iconStyle={styles.icon}
+                        />
+                      }
+                      buttonStyle={styles.card_button}
+                      title="Télécharger"
+                    />
+                  </Card>
+                )}
+                {file.mimeType.includes('pdf') && (
+                  <View style={styles.pdfViewontainer}>
+                    <Card style={styles.card}>
+                      <Pdf
+                        source={{
+                          uri: getURL(
+                            data.messageById.messageId,
+                            file.fileId,
+                            file.mimeType,
+                            file.fileName,
+                          ),
+                          cache: true,
+                        }}
+                        onLoadComplete={(numberOfPages, filePath) => {
+                          console.log(`number of pages: ${numberOfPages}`);
+                        }}
+                        onPageChanged={(page, numberOfPages) => {
+                          console.log(`current page: ${page}`);
+                        }}
+                        onError={error => {
+                          console.log(error);
+                        }}
+                        onPressLink={uri => {
+                          console.log(`Link presse: ${uri}`);
+                        }}
+                        style={styles.pdf}
+                      />
+                      <Button
+                        icon={
+                          <Icon
+                            name="file-pdf"
+                            size={20}
+                            color="#fff"
+                            type="font-awesome-5"
+                            iconStyle={styles.icon}
+                          />
+                        }
+                        buttonStyle={styles.card_button}
+                        title="Télécharger"
+                        onPress={() => {
+                          checkPermission(
+                            getURL(
+                              data.messageById.messageId,
+                              file.fileId,
+                              file.mimeType,
+                              file.fileName,
+                            ),
+                          );
+                        }}
+                      />
+                    </Card>
+                  </View>
+                )}
+                {/* <TouchableOpacity
+                  style={styles.button}
+                  key={file._id}
+                  onPress={() => {
+                    onFileView(file, data.messageById.messageId);
+                  }}>
+                  <Text style={styles.button_text}>{file.fileName}</Text>
+                </TouchableOpacity> */}
+              </View>
             );
           })}
         </View>
@@ -205,6 +415,37 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignContent: 'center',
+  },
+  imageAttachement: {
+    height: 200,
+    width: '100%',
+    resizeMode: 'contain',
+  },
+  pdfViewontainer: {
+    width: '100%',
+  },
+  pdf: {
+    flex: 1,
+    width: '100%',
+    height: 250,
+    marginBottom: 10,
+  },
+  center: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  card: {
+    width: '100%',
+  },
+  icon: {
+    marginRight: 5,
+  },
+  card_button: {
+    backgroundColor: colors.buttonPrimary,
+    borderRadius: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    marginBottom: 0,
   },
 });
 
