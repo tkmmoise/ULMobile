@@ -233,6 +233,16 @@ const Detail = ({route, navigation}) => {
                       }
                       buttonStyle={styles.card_button}
                       title="Télécharger"
+                      onPress={() => {
+                        checkPermission(
+                          getURL(
+                            data.messageById.messageId,
+                            file.fileId,
+                            file.mimeType,
+                            file.fileName,
+                          ),
+                        );
+                      }}
                     />
                   </Card>
                 )}
