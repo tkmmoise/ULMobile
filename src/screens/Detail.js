@@ -21,6 +21,7 @@ import moment from 'moment';
 import FileViewer from 'react-native-file-viewer';
 import Pdf from 'react-native-pdf';
 import {Card, Button, Icon} from 'react-native-elements';
+import {showMessage, hideMessage} from 'react-native-flash-message';
 
 //For file upload
 var RNFS = require('react-native-fs');
@@ -38,8 +39,6 @@ import {uri} from '../config/apollo.config';
 
 const Detail = ({route, navigation}) => {
   const {id} = route.params;
-
-  const source = 'http://samples.leanpub.com/thereactnativebook-sample.pdf';
 
   const onFileView = async (file, messageId) => {
     // Put your url here -----
@@ -85,9 +84,9 @@ const Detail = ({route, navigation}) => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
           {
-            title: 'Storage Permission Required',
+            title: 'Autorisation de stockage requise',
             message:
-              'Application needs access to your storage to download File',
+              "L'application a besoin d'accéder à votre stockage pour télécharger le fichier",
           },
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
@@ -96,7 +95,7 @@ const Detail = ({route, navigation}) => {
           console.log('Storage Permission Granted.');
         } else {
           // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
+          Alert.alert('Error', 'Autorisation de stockage non accordée');
         }
       } catch (err) {
         // To handle permission related exception
@@ -118,7 +117,7 @@ const Detail = ({route, navigation}) => {
     // config: To get response by passing the downloading related options
     // fs: Root directory path to download
     const {config, fs} = RNFetchBlob;
-    let RootDir = fs.dirs.PictureDir;
+    let RootDir = fs.dirs.DownloadDir;
     let options = {
       fileCache: true,
       addAndroidDownloads: {
@@ -138,8 +137,11 @@ const Detail = ({route, navigation}) => {
       .fetch('GET', FILE_URL)
       .then(res => {
         // Alert after successful downloading
-        console.log('res -> ', JSON.stringify(res));
-        alert('File Downloaded Successfully.');
+        // alert('File Downloaded Successfully.');
+        showMessage({
+          message: 'Fichier téléchargé',
+          type: 'success',
+        });
       });
   };
 
@@ -302,14 +304,6 @@ const Detail = ({route, navigation}) => {
                     </Card>
                   </View>
                 )}
-                {/* <TouchableOpacity
-                  style={styles.button}
-                  key={file._id}
-                  onPress={() => {
-                    onFileView(file, data.messageById.messageId);
-                  }}>
-                  <Text style={styles.button_text}>{file.fileName}</Text>
-                </TouchableOpacity> */}
               </View>
             );
           })}

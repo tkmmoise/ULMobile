@@ -5,6 +5,7 @@ import AppStackNavigator from './src/navigations/AppStackNavigator';
 import {Provider as PaperProvider} from 'react-native-paper';
 import messaging from '@react-native-firebase/messaging';
 import axios from 'axios';
+import FlashMessage from 'react-native-flash-message';
 
 //redux modules
 import rootReducer from './src/redux/slices';
@@ -73,6 +74,7 @@ const App = () => {
           </NavigationContainer>
         </PaperProvider>
       </Provider>
+      <FlashMessage position="top" />
     </ApolloProvider>
   );
 };
