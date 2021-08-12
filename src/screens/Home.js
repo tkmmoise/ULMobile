@@ -36,11 +36,9 @@ export const Home = props => {
   );
   // Fetch all noeuds in graphql server
   const {loading, error, data} = useQuery(GET_NODES);
-  // const allnoeudsIds = data?.noeudMany.map(noeud => {
-  //   return noeud._id;
-  // });
+  const allnoeudsIds = data?.noeudMany.filter(noeud => noeud.isSelected);
   // allnoeudsIds && currentSelectedNoeudsIds([...allnoeudsIds] || []);
-  // console.log('allnoeudsIds', allnoeudsIds);
+  //rconsole.log('allnoeudsIds', allnoeudsIds);
 
   // useEffect(() => {
   //   allnoeudsIds && currentSelectedNoeudsIds([...allnoeudsIds] || []);
@@ -68,7 +66,7 @@ export const Home = props => {
     }
     return (
       <FlatList
-        data={data.noeudMany}
+        data={allnoeudsIds.length === 0 ? data.noeudMany : allnoeudsIds}
         renderItem={renderNoeudItem}
         keyExtractor={item => item._id}
         extraData={selectedNoeud}
@@ -97,6 +95,8 @@ export const Home = props => {
   function Messages(_id) {
     const {loading, error, data} = useQuery(GET_MESSAGES_BY_NODE, {
       variables: {_id},
+      fetchPolicy: 'network-only', // Used for first execution
+      nextFetchPolicy: 'cache-and-network',
     });
 
     if (loading) {
