@@ -21,7 +21,7 @@ import moment from 'moment';
 import FileViewer from 'react-native-file-viewer';
 import Pdf from 'react-native-pdf';
 import {Card, Button, Icon} from 'react-native-elements';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+//import {showMessage, hideMessage} from 'react-native-flash-message';
 
 //For file upload
 var RNFS = require('react-native-fs');
@@ -137,11 +137,11 @@ const Detail = ({route, navigation}) => {
       .fetch('GET', FILE_URL)
       .then(res => {
         // Alert after successful downloading
-        // alert('File Downloaded Successfully.');
-        showMessage({
+        alert('File Downloaded Successfully.');
+        /* showMessage({
           message: 'Fichier téléchargé',
           type: 'success',
-        });
+        }); */
       });
   };
 
