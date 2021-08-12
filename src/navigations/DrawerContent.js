@@ -1,8 +1,8 @@
 import {DrawerContentScrollView} from '@react-navigation/drawer';
-import {Drawer, TouchableRipple, Switch} from 'react-native-paper';
+import {Drawer, TouchableRipple} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Switch} from 'react-native';
 import colors from '../../assets/colors/colors';
 
 //graphql
@@ -52,6 +52,13 @@ export function DrawerContent(props) {
                     <View>
                       <Switch
                         value={noeud.isSelected}
+                        trackColor={{
+                          false: colors.textLight,
+                          true: colors.primary,
+                        }}
+                        thumbColor={
+                          noeud.isSelected ? colors.primary : '#f4f3f4'
+                        }
                         color={colors.primary}
                         onValueChange={() => toggleNoeudSelected(noeud._id)}
                       />
@@ -93,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
-    marginTop: -10
+    marginTop: -10,
   },
   appTitle: {
     color: colors.white,
@@ -129,7 +136,7 @@ const styles = StyleSheet.create({
   bottomDrawerSection: {
     //backgroundColor: colors.textDark,
     borderTopWidth: 1,
-    borderColor: "black"
+    borderColor: 'black',
   },
   drawerItem: {
     color: colors.textDark,

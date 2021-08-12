@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -35,10 +35,21 @@ import {getURL} from '../services/attachements';
 
 //My imports
 import colors from '../../assets/colors/colors';
-import {uri} from '../config/apollo.config';
 
 const Detail = ({route, navigation}) => {
   const {id} = route.params;
+  /* const [isDownload, setIsDownload] = useState(false);
+  const [fileName, setFileName] = useState('');
+
+  /* const checkFileIsDownload = fileName => {
+    const targetPath = `${RNFetchBlob.fs.dirs.DownloadDir}/${fileName}`;
+
+    return RNFetchBlob.fs.exists(targetPath);
+  };
+
+  useEffect(() => {
+    checkFileIsDownload()
+  }, []); */
 
   const onFileView = async (file, messageId) => {
     // Put your url here -----
@@ -121,12 +132,7 @@ const Detail = ({route, navigation}) => {
     let options = {
       fileCache: true,
       addAndroidDownloads: {
-         path:
-           RootDir +
-           '/file_' +
-           Math.floor(date.getTime() + date.getSeconds() / 2) +
-           file_ext,
-        //path: `${RootDir}/${fileName}`,
+        path: `${RootDir}/${fileName}`,
         description: 'downloading file...',
         notification: true,
         // useDownloadManager works with Android only
@@ -137,11 +143,12 @@ const Detail = ({route, navigation}) => {
       .fetch('GET', FILE_URL)
       .then(res => {
         // Alert after successful downloading
-        alert('File Downloaded Successfully.');
-        /* showMessage({
+        // alert('File Downloaded Successfully.');
+        //setIsDownload(true);
+        showMessage({
           message: 'Fichier téléchargé',
           type: 'success',
-        }); */
+        }); 
       });
   };
 
@@ -244,7 +251,7 @@ const Detail = ({route, navigation}) => {
                             file.mimeType,
                             file.fileName,
                           ),
-                          file.fileName
+                          file.fileName,
                         );
                       }}
                     />
@@ -297,7 +304,7 @@ const Detail = ({route, navigation}) => {
                               file.mimeType,
                               file.fileName,
                             ),
-                            file.fileName
+                            file.fileName,
                           );
                         }}
                       />
