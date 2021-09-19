@@ -1,13 +1,21 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Animated,
+} from 'react-native';
 import moment from 'moment';
 
 //colors
 import colors from '../../assets/colors/colors';
-const Message = ({item, onPress}) => {
+const Message = ({item, scale, onPress}) => {
   return (
     <TouchableOpacity key={item._id} onPress={onPress}>
-      <View style={[styles.messageCardWrapper]}>
+      <Animated.View
+        style={[styles.messageCardWrapper, {transform: [{scale}]}]}>
         <View style={styles.messageCardHeader}>
           <View style={styles.messageCardLeft}>
             <Image
@@ -32,7 +40,7 @@ const Message = ({item, onPress}) => {
             Publie le {moment(item.date).format('DD/MM/YY hh:mm')}
           </Text>
         </View>
-      </View>
+      </Animated.View>
     </TouchableOpacity>
   );
 };
@@ -50,11 +58,12 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 1,
     width: '100%',
-    marginTop: 20,
+    marginBottom: 20,
+    padding: 10,
   },
   messageCardHeader: {
     flexDirection: 'row',
-    margin: 10,
+    backgroundColor: 'red',
   },
   messageCardLeft: {
     height: 63,
@@ -81,8 +90,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   messageCardBottom: {
-    marginHorizontal: 10,
-    marginBottom: 10,
     marginTop: 5,
     flexDirection: 'row',
     justifyContent: 'flex-end',

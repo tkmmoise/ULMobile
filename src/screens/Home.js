@@ -8,7 +8,11 @@ import {
   FlatList,
   Modal,
   ActivityIndicator,
+  Animated,
+  Easing,
+  Dimensions,
 } from 'react-native';
+const {width, height} = Dimensions.get('screen');
 import {DrawerActions} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useQuery} from '@apollo/client';
@@ -29,20 +33,29 @@ import sortlist from '../../assets/data/sortList';
 import {GET_NODES, GET_MESSAGES_BY_NODE} from '../graphql/queries';
 import {currentSelectedNoeudsIds} from '../config/cache';
 
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
+const ITEM_SIZE = 102.7 + 20;
+
 export const Home = props => {
+  const scrollY = React.useRef(new Animated.Value(0)).current;
   // State For active noeud
   const [selectedNoeud, setSelectedNoeud] = useState(
     '60dd18a767831b4344d4b0e2',
   );
+  //For refrsh control
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+  const onRefresh2 = () => {
+    setRefreshing(true);
+  };
   // Fetch all noeuds in graphql server
   const {loading, error, data} = useQuery(GET_NODES);
   const allnoeudsIds = data?.noeudMany.filter(noeud => noeud.isSelected);
-  // allnoeudsIds && currentSelectedNoeudsIds([...allnoeudsIds] || []);
-  //rconsole.log('allnoeudsIds', allnoeudsIds);
-
-  // useEffect(() => {
-  //   allnoeudsIds && currentSelectedNoeudsIds([...allnoeudsIds] || []);
-  // }, []);
 
   // State For sort messages
   const [visible, setVisible] = useState(false);
@@ -122,19 +135,32 @@ export const Home = props => {
         </Text>
       </View>
     ) : (
-      <FlatList
+      <Animated.FlatList
         data={data.noeudById.messages}
         renderItem={renderMessageItem}
         keyExtractor={item => item._id}
+        contentContainerStyle={{paddingHorizontal: 35}}
         showsVerticalScrollIndicator={false}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: true},
+        )}
       />
     );
   }
 
-  const renderMessageItem = ({item}) => {
+  const renderMessageItem = ({item, index}) => {
+    const inputRange = [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)];
+    const scale = scrollY.interpolate({
+      inputRange,
+      outputRange: [1, 1, 1, 0],
+    });
     return (
       <Message
         item={item}
+        scale={scale}
         onPress={() => {
           props.navigation.navigate('Detail', {id: item._id});
         }}
@@ -273,7 +299,6 @@ const styles = StyleSheet.create({
   },
   messageWrapper: {
     flex: 1,
-    paddingHorizontal: 35,
     marginBottom: 20,
   },
   activityIndicator: {
