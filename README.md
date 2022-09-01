@@ -72,7 +72,7 @@ L'application ULBoard mobile a été développé au cours d'un projet scolaire p
 
 ## :rocket: Technologies ##
 
-The following tools were used in this project:
+Les outils et technologies suivants ont été utilisés dans ce projet :
 
 - [React](https://pt-br.reactjs.org/)
 - [React Native](https://reactnative.dev/)
